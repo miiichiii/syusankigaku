@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>周産期学１テスト3</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      background-size: cover; 
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1, h2 {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+
+}
+    .quiz-container, .result-card {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .question {
+      font-size: 1.3em;
+      margin-bottom: 20px;
+      color: #1d1d1f;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    .option {
+      background-color: rgba(255, 255, 255, 0.7);
+  border: none;
+  border-radius: 16px;
+  padding: 15px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease 0.1s, transform 0.3s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .option:hover {
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .option.selected {
+      background-color: #007aff;
+      color: #fff;
+    }
+    .option.disabled {
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+      }
+    /* 正解時のグラデーション */
+.option.correct {
+  background: linear-gradient(135deg, #34c759, #a8e6cf); /* 正解のグラデーション */
+  color: #fff;
+}
+
+/* 不正解時のグラデーション */
+.option.incorrect {
+  background: linear-gradient(135deg, #ff3b30, #ff9a8b); /* 不正解のグラデーション */
+  color: #fff;
+}
+
+    .option::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .option:active::after {
+      transform: scale(0.98);
+    }
+    .explanation {
+  margin-top: 20px;
+  font-size: 1em;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-left: 5px solid #4caf50;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 1; /* 修正 */
+  transition: opacity 0.3s ease;
+}
+
+.explanation-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.explanation-icon {
+  font-size: 1.5em;
+  margin-right: 10px;
+}
+    .nav-button {
+  background: linear-gradient(135deg, #007aff, #5ac8fa);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-top: 20px;
+  width: 100%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-button:hover {
+  background: linear-gradient(135deg, #005bb5, #4aa0d3);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.nav-button:active {
+  transform: scale(0.98);
+}
+    .result-card {
+      margin-bottom: 20px;
+    }
+    .result-card h3 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .result-status {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .correct {
+      color: #34c759;
+    }
+    .incorrect {
+      color: #ff3b30;
+    }
+    #attendance-link {
+      background-color: #34c759;
+      color: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+      display: none;
+    }
+    #attendance-link a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    #attendance-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center;">周産期学１テスト3</h1>
+    <div id="quiz-container" class="quiz-container">
+      <div id="quiz-content">
+        <div id="question" class="question"></div>
+        <div id="options" class="options"></div>
+        <div id="explanation" class="explanation"></div>
+      </div>
+      <button id="next" class="nav-button" onclick="nextQuestion()">次の問題</button>
+    </div>
+    <div id="result-container"></div>
+    <div id="attendance-link"></div>
+  </div>
+  
+  
+  <script>
+    const quizData = [
+  {
+    "question": "卵巣動脈の起始はどれですか？",
+    "options": [
+      "内腸骨動脈",
+      "総腸骨動脈",
+      "大動脈の腎動脈分枝部のやや下方",
+      "外腸骨動脈"
+    ],
+    "answer": 2,
+    "explanation": "卵巣動脈は、大動脈の腎動脈分枝部のやや下方から両側に分枝します。"
+  },
+  {
+    "question": "子宮動脈が尿管と交差する際の位置関係で正しいのはどれですか？",
+    "options": [
+      "子宮動脈が尿管の後方を走行する",
+      "子宮動脈が尿管の前方を走行する",
+      "子宮動脈と尿管は交差しない",
+      "子宮動脈が尿管の下方を走行する"
+    ],
+    "answer": 1,
+    "explanation": "子宮動脈は基靱帯上縁を走行し、尿管の前方でこれと交差します。"
+  },
+  {
+    "question": "妊娠時の子宮動脈血流量の目安はどれですか？",
+    "options": [
+      "50mL/分",
+      "100mL/分",
+      "250mL/分",
+      "500mL/分"
+    ],
+    "answer": 3,
+    "explanation": "妊娠時には胎盤へも血液を送るため、子宮動脈血流は約500mL/分に増加します。"
+  },
+  {
+    "question": "内陰部動脈が主に血液を供給する領域でないのはどれですか？",
+    "options": [
+      "外陰部",
+      "会陰",
+      "卵巣",
+      "膀胱中部・下部（一部）"
+    ],
+    "answer": 2,
+    "explanation": "内陰部動脈は外陰部、会陰、膀胱中部・下部（一部）に供給します。卵巣には卵巣動脈が主に供給します。"
+  },
+  {
+    "question": "子宮動脈と卵巣動脈の吻合の臨床的意義として正しいのはどれですか？",
+    "options": [
+      "子宮切除時に卵巣機能が必ず低下する",
+      "子宮動脈を結紮しても卵巣への血流が維持されやすい",
+      "卵巣摘出時に子宮への血流が完全に遮断される",
+      "吻合があるため、卵巣動脈の結紮は不要である"
+    ],
+    "answer": 1,
+    "explanation": "卵巣動脈と子宮動脈の卵巣枝が吻合しているため、子宮切除のために子宮動脈を結紮しても、卵巣動脈からの血流により卵巣への血液供給は維持され、ホルモン異常が生じる可能性は低いです。"
+  },
+  {
+    "question": "右側の卵巣静脈が還流するのはどれですか？",
+    "options": [
+      "左腎静脈",
+      "右腎静脈",
+      "下大静脈",
+      "門脈"
+    ],
+    "answer": 2,
+    "explanation": "右側の卵巣静脈は下大静脈に直接流入します。左側は左腎静脈に流入します。"
+  },
+  {
+    "question": "骨盤内うっ血症候群の原因として考えられるのはどれですか？",
+    "options": [
+      "動脈の拡張",
+      "静脈叢のうっ血",
+      "リンパ管の閉塞",
+      "神経の炎症"
+    ],
+    "answer": 1,
+    "explanation": "骨盤内うっ血症候群は、骨盤内の静脈叢のうっ血が慢性的な骨盤痛の原因となることがある疾患です。"
+  },
+  {
+    "question": "子宮全摘術時に尿管損傷のリスクが特に高いのは、どの血管との位置関係に起因しますか？",
+    "options": [
+      "卵巣動脈",
+      "子宮動脈",
+      "内陰部動脈",
+      "上膀胱動脈"
+    ],
+    "answer": 1,
+    "explanation": "子宮動脈と尿管の交差部は非常に近接しており、子宮全摘術時にはこの位置関係の正確な把握が尿管損傷を防ぐために極めて重要です。"
+  },
+  {
+    "question": "骨盤神経叢（下下腹神経叢）を形成する神経の組み合わせで正しいのはどれですか？",
+    "options": [
+      "交感神経のみ",
+      "副交感神経のみ",
+      "交感神経と副交感神経",
+      "体性神経のみ"
+    ],
+    "answer": 2,
+    "explanation": "骨盤神経叢（下下腹神経叢）は、交感神経（下腹神経経由）と副交感神経（骨盤内臓神経）が合流して形成されます。"
+  },
+  {
+    "question": "骨盤内臓神経の起始となる脊髄レベルはどれですか？",
+    "options": [
+      "第10胸髄～第3腰髄",
+      "第1～第4腰髄",
+      "第2・3・4仙髄",
+      "第5仙髄～尾骨神経"
+    ],
+    "answer": 2,
+    "explanation": "骨盤内臓神経は、第2・3・4仙髄から出る副交感神経です。"
+  },
+  {
+    "question": "子宮体部からの痛み刺激を伝達する主要な神経はどれですか？",
+    "options": [
+      "交感神経",
+      "副交感神経",
+      "陰部神経",
+      "骨盤内臓神経"
+    ],
+    "answer": 0,
+    "explanation": "子宮体部からの痛み刺激は交感神経に沿って下部胸部・上部腰部脊髄神経節に達します。"
+  },
+  {
+    "question": "子宮頸部・腟上部からの痛み刺激を伝達する主要な神経はどれですか？",
+    "options": [
+      "交感神経",
+      "副交感神経",
+      "陰部神経",
+      "下腹神経"
+    ],
+    "answer": 1,
+    "explanation": "子宮頸部と腟上部からの痛み刺激は副交感神経（骨盤内臓神経）に沿ってS2～S4の脊髄知覚神経節に達します。"
+  },
+  {
+    "question": "無痛分娩の硬膜外麻酔で主にブロックする神経レベルはどれですか？",
+    "options": [
+      "T10～L1",
+      "L1～L4",
+      "S2～S4",
+      "C5～T1"
+    ],
+    "answer": 2,
+    "explanation": "硬膜外麻酔ではS2～S4レベルの神経をブロックすることで、子宮頸部・腟上部からの痛みを遮断します。"
+  },
+  {
+    "question": "陰部神経の起始となる神経叢はどれですか？",
+    "options": [
+      "腰神経叢",
+      "仙骨神経叢",
+      "腕神経叢",
+      "頸神経叢"
+    ],
+    "answer": 1,
+    "explanation": "陰部神経は仙骨神経叢の第2～4仙骨神経の前枝から出ます。"
+  },
+  {
+    "question": "卵巣からのリンパが主に流入するリンパ節はどれですか？",
+    "options": [
+      "浅鼠径リンパ節",
+      "内腸骨リンパ節",
+      "腰リンパ節（腹部大動脈周囲リンパ節）",
+      "仙骨リンパ節"
+    ],
+    "answer": 2,
+    "explanation": "卵巣からのリンパは主に卵巣動脈に沿って上行し、腰リンパ節（腹部大動脈周囲のリンパ節）に流入します。"
+  },
+  {
+    "question": "外陰部・腟下部からのリンパが主に流入するリンパ節はどれですか？",
+    "options": [
+      "浅鼠径リンパ節",
+      "外腸骨リンパ節",
+      "腰リンパ節",
+      "仙骨リンパ節"
+    ],
+    "answer": 0,
+    "explanation": "外陰部・会陰・腟下部からのリンパは主に浅鼠径リンパ節へ流入します。"
+  },
+  {
+    "question": "子宮を側方から支持し、内部に子宮動静脈や骨盤神経を含む靱帯はどれですか？",
+    "options": [
+      "仙骨子宮靱帯",
+      "基靱帯",
+      "子宮円索（円靱帯）",
+      "卵巣提索（骨盤漏斗靱帯）"
+    ],
+    "answer": 1,
+    "explanation": "基靱帯は子宮頸部と骨盤側壁を結び、子宮を側方から強力に支持します。内部には子宮動静脈や骨盤神経が含まれます。"
+  },
+  {
+    "question": "子宮を後上方に引き上げ支持し、内部に自律神経（骨盤内臓神経からの枝）を含む靱帯はどれですか？",
+    "options": [
+      "仙骨子宮靱帯",
+      "基靱帯",
+      "膀胱子宮靱帯",
+      "子宮円索（円靱帯）"
+    ],
+    "answer": 0,
+    "explanation": "仙骨子宮靱帯は子宮を後上方に引き上げ支持し、その中には仙骨部から走る自律神経を含みます。"
+  },
+  {
+    "question": "卵巣動静脈が走行する靱帯はどれですか？",
+    "options": [
+      "固有卵巣索（卵巣固有靱帯）",
+      "子宮円索（円靱帯）",
+      "卵巣提索（骨盤漏斗靱帯）",
+      "基靱帯"
+    ],
+    "answer": 2,
+    "explanation": "卵巣提索（骨盤漏斗靱帯）は卵巣と骨盤側壁を結び、内部を卵巣動静脈が走行します。"
+  },
+  {
+    "question": "子宮を前傾位に保つ補助をする靱帯で、鼠径管を通って外陰部の皮下に達するのはどれですか？",
+    "options": [
+      "仙骨子宮靱帯",
+      "基靱帯",
+      "膀胱子宮靱帯",
+      "子宮円索（円靱帯）"
+    ],
+    "answer": 3,
+    "explanation": "子宮円索（円靱帯）は子宮を前傾位に保つ補助をし、鼠径管を通って外陰部の皮下に達します。"
+  }
+]
+;
+
+      let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let shuffledOptions = [];
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function loadQuestion() {
+      const question = quizData[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+
+      shuffledOptions = shuffleArray([...question.options]);
+      const optionsHtml = shuffledOptions.map((option, index) => `
+        <div class="option" onclick="selectOption(${index})">${option}</div>
+      `).join('');
+
+      document.getElementById('options').innerHTML = optionsHtml;
+
+      // 解説のリセット
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.style.opacity = '0';
+      explanationEl.style.display = 'none';
+    }
+
+    function selectOption(index) {
+  const options = document.querySelectorAll('.option');
+  if (options[index].classList.contains('disabled')) {
+    return;
+  }
+
+  // すべての選択肢を無効化
+  options.forEach(option => {
+    option.classList.add('disabled');
+  });
+
+  // 選択肢を選んだときに`selected`クラスを追加
+  options[index].classList.add('selected');
+
+  // 現在の問題を取得
+  const question = quizData[currentQuestion];
+  const selectedAnswerIndex = question.options.indexOf(shuffledOptions[index]);
+  userAnswers[currentQuestion] = selectedAnswerIndex;
+
+  // 解説の表示内容を設定
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.innerHTML = `
+    <div class="explanation-header">
+      <span class="explanation-icon">💡</span>
+      解説
+    </div>
+    ${question.explanation}
+  `;
+  
+  // 一旦解説を見えないようにしてから表示の遅延を設定
+  explanationEl.style.opacity = '0';
+  explanationEl.style.display = 'block'; // まず表示を「block」にする
+
+  // 遅延を設定して解説をフェードイン
+  setTimeout(() => {
+    explanationEl.style.opacity = '1'; // 遅れてopacityを1にする
+  }, 200); // 200msの遅延を設定
+
+  // 正解・不正解のクラスを付与してグラデーションを適用
+  if (selectedAnswerIndex === question.answer) {
+    explanationEl.style.backgroundColor = '#e8f5e9';
+    explanationEl.style.borderLeftColor = '#4caf50';
+    options[index].classList.add('correct'); // 正解時に`correct`クラスを追加
+  } else {
+    explanationEl.style.backgroundColor = '#ffebee';
+    explanationEl.style.borderLeftColor = '#f44336';
+    options[index].classList.add('incorrect'); // 不正解時に`incorrect`クラスを追加
+  }
+}
+
+function loadQuestion() {
+  const question = quizData[currentQuestion];
+  document.getElementById('question').textContent = question.question;
+
+  shuffledOptions = shuffleArray([...question.options]);
+  const optionsHtml = shuffledOptions.map((option, index) => `
+    <div class="option" onclick="selectOption(${index})">${option}</div>
+  `).join('');
+
+  document.getElementById('options').innerHTML = optionsHtml;
+
+  // 解説のリセット
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.style.display = 'none'; // 解説を非表示に
+  explanationEl.style.opacity = '0'; // 解説のopacityをリセット
+}
+
+function loadQuestion() {
+  const question = quizData[currentQuestion];
+  document.getElementById('question').textContent = question.question;
+
+  shuffledOptions = shuffleArray([...question.options]);
+  const optionsHtml = shuffledOptions.map((option, index) => `
+    <div class="option" onclick="selectOption(${index})">${option}</div>
+  `).join('');
+
+  document.getElementById('options').innerHTML = optionsHtml;
+
+  // 解説のリセット
+  const explanationEl = document.getElementById('explanation');
+  explanationEl.style.display = 'none'; // 解説を非表示に
+}
+    function nextQuestion() {
+      const selectedOption = document.querySelector('.option.selected');
+      if (selectedOption === null) {
+        alert('選択肢を選んでください');
+        return; 
+      }
+
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      score = userAnswers.reduce((total, answer, index) => 
+        total + (answer === quizData[index].answer ? 1 : 0), 0);
+
+      const resultContainer = document.getElementById('result-container');
+      const quizContainer = document.getElementById('quiz-container');
+      quizContainer.style.display = 'none';
+
+      const percentage = (score / quizData.length) * 100;
+      let resultHtml = `
+        <h2>クイズ結果</h2>
+        <p>正解数: ${score} / ${quizData.length}</p>
+        <p>正答率: ${percentage.toFixed(2)}%</p>
+      `;
+
+      quizData.forEach((question, index) => {
+        const isCorrect = userAnswers[index] === question.answer;
+        resultHtml += `
+          <div class="result-card">
+            <h3>問題 ${index + 1}</h3>
+            <p class="result-status ${isCorrect ? 'correct' : 'incorrect'}">
+              ${isCorrect ? '正解' : '不正解'}
+            </p>
+            <p><strong>質問:</strong> ${question.question}</p>
+            <p><strong>あなたの回答:</strong> ${question.options[userAnswers[index]] || '未回答'}</p>
+            <p><strong>正解:</strong> ${question.options[question.answer]}</p>
+            <p><strong>説明:</strong> ${question.explanation}</p>
+          </div>
+        `;
+      });
+
+      resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
+      resultContainer.innerHTML = resultHtml;
+
+      if (percentage === 100) {
+        const attendanceLink = document.getElementById('attendance-link');
+        attendanceLink.style.display = 'block';
+        attendanceLink.innerHTML = `
+          <p>おめでとうございます！全問正解です。</p>
+          <a href="https://forms.gle/mwrMS6iBEDm2q5D88" target="_blank">出席確認フォームに回答する</a>
+        `;
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      userAnswers = [];
+      shuffledOptions = [];
+      document.getElementById('quiz-container').style.display = 'block';
+      document.getElementById('result-container').innerHTML = '';
+      document.getElementById('attendance-link').style.display = 'none';
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
