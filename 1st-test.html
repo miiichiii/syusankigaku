@@ -179,6 +179,67 @@
     #attendance-link a:hover {
       text-decoration: underline;
     }
+  
+    .celebration-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      overflow: hidden;
+    }
+    .celebration-card {
+      background: rgba(255,255,255,0.92);
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+      text-align: center;
+      max-width: 420px;
+      width: calc(100% - 32px);
+      animation: popIn 0.45s ease;
+    }
+    .celebration-card h2 {
+      margin: 0 0 10px;
+      color: #ff4f87;
+      font-size: 2em;
+    }
+    .celebration-card p {
+      margin: 8px 0;
+      font-size: 1.05em;
+    }
+    .celebration-close {
+      margin-top: 18px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ff7eb3, #ff758c);
+      color: white;
+      padding: 12px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255, 117, 140, 0.35);
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 18px;
+      top: -20px;
+      opacity: 0.9;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 1;
+      }
+    }
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
   </style>
 </head>
 <body>
@@ -536,6 +597,56 @@
     let userAnswers = [];
     let shuffledOptions = [];
 
+const QUIZ_PROGRESS_KEY = 'syusankigaku_total_answered';
+const QUIZ_CELEBRATED_KEY = 'syusankigaku_celebrated_100';
+
+function showCelebrationIfNeeded(answeredCount) {
+  try {
+    const total = Number(localStorage.getItem(QUIZ_PROGRESS_KEY) || '0') + answeredCount;
+    localStorage.setItem(QUIZ_PROGRESS_KEY, String(total));
+    const celebrated = localStorage.getItem(QUIZ_CELEBRATED_KEY) === 'true';
+    if (total >= 100 && !celebrated) {
+      localStorage.setItem(QUIZ_CELEBRATED_KEY, 'true');
+      openCelebration(total);
+    }
+  } catch (e) {
+    console.warn('celebration disabled', e);
+  }
+}
+
+function openCelebration(total) {
+  const overlay = document.getElementById('celebration-overlay');
+  if (!overlay) return;
+  const p = overlay.querySelectorAll('p');
+  if (p[0]) p[0].textContent = `累計${total}問達成です！`;
+  overlay.style.display = 'flex';
+  launchConfetti();
+}
+
+function closeCelebration() {
+  const overlay = document.getElementById('celebration-overlay');
+  if (!overlay) return;
+  overlay.style.display = 'none';
+  overlay.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+}
+
+function launchConfetti() {
+  const overlay = document.getElementById('celebration-overlay');
+  if (!overlay) return;
+  const colors = ['#ff6b6b', '#ffd93d', '#6bcBef', '#9d4edd', '#51cf66', '#ff8fab'];
+  for (let i = 0; i < 120; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.background = colors[i % colors.length];
+    piece.style.transform = `translateY(0) rotate(${Math.random()*360}deg)`;
+    piece.style.animationDuration = (3 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    overlay.appendChild(piece);
+  }
+}
+
+
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -692,6 +803,8 @@ function loadQuestion() {
       resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
       resultContainer.innerHTML = resultHtml;
 
+      showCelebrationIfNeeded(quizData.length);
+
       if (percentage === 100) {
         const attendanceLink = document.getElementById('attendance-link');
         attendanceLink.style.display = 'block';
@@ -715,5 +828,15 @@ function loadQuestion() {
 
     loadQuestion();
   </script>
+
+  <div id="celebration-overlay" class="celebration-overlay">
+    <div class="celebration-card">
+      <h2>🎉 おめでとう！</h2>
+      <p>累計100問達成です！</p>
+      <p>ここまでよく頑張りました。</p>
+      <button class="celebration-close" onclick="closeCelebration()">とじる</button>
+    </div>
+  </div>
+
 </body>
 </html>
