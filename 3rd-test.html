@@ -488,28 +488,9 @@
     let userAnswers = [];
     let shuffledOptions = [];
 
-const QUIZ_PROGRESS_KEY = 'syusankigaku_total_answered';
-const QUIZ_CELEBRATED_KEY = 'syusankigaku_celebrated_100';
-
-function showCelebrationIfNeeded(answeredCount) {
-  try {
-    const total = Number(localStorage.getItem(QUIZ_PROGRESS_KEY) || '0') + answeredCount;
-    localStorage.setItem(QUIZ_PROGRESS_KEY, String(total));
-    const celebrated = localStorage.getItem(QUIZ_CELEBRATED_KEY) === 'true';
-    if (total >= 100 && !celebrated) {
-      localStorage.setItem(QUIZ_CELEBRATED_KEY, 'true');
-      openCelebration(total);
-    }
-  } catch (e) {
-    console.warn('celebration disabled', e);
-  }
-}
-
-function openCelebration(total) {
+function openCelebration() {
   const overlay = document.getElementById('celebration-overlay');
   if (!overlay) return;
-  const p = overlay.querySelectorAll('p');
-  if (p[0]) p[0].textContent = `累計${total}問達成です！`;
   overlay.style.display = 'flex';
   launchConfetti();
 }
@@ -535,6 +516,7 @@ function launchConfetti() {
     piece.style.animationDelay = (Math.random() * 0.8) + 's';
     overlay.appendChild(piece);
   }
+}
 }
 
 
@@ -694,7 +676,7 @@ function loadQuestion() {
       resultHtml += `<button class="nav-button" onclick="restartQuiz()">もう一度挑戦する</button>`;
       resultContainer.innerHTML = resultHtml;
 
-      showCelebrationIfNeeded(quizData.length);
+      
 
       if (percentage === 100) {
         const attendanceLink = document.getElementById('attendance-link');
@@ -723,8 +705,8 @@ function loadQuestion() {
   <div id="celebration-overlay" class="celebration-overlay">
     <div class="celebration-card">
       <h2>🎉 おめでとう！</h2>
-      <p>累計100問達成です！</p>
-      <p>ここまでよく頑張りました。</p>
+      <p>全問正解です！</p>
+      <p>すばらしいです。おめでとうございます！</p>
       <button class="celebration-close" onclick="closeCelebration()">とじる</button>
     </div>
   </div>
